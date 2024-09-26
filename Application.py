@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import openai
 import boto3
@@ -6,11 +7,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 
-# OpenAI API Key
-openai.api_key = 'sk-ZQuwt-NjRD5O6VVERM6Pittqk-VsICiOUploWQC50-T3BlbkFJ_gq7oVX_Xt5psrSHloWeLS-jEJzGw7-glGdDoBX_0A'
+# Load sensitive information from environment variables
+openai.api_key = st.secrets['OPENAI_API_KEY']
 
 # AWS S3 Configuration
-s3_client = boto3.client('s3')
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=st.secrets['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key=st.secrets['AWS_SECRET_ACCESS_KEY'],
+    region_name=st.secrets['AWS_REGION']
+)
 s3_bucket = 'gaiaproject'
 
 # Load metadata.jsonl from S3
@@ -97,7 +103,6 @@ def main():
     col1, col2 = st.columns([2, 1])
 
     selected_test_case_option = col1.selectbox("**Select a Test Case**", test_case_options)
-
 
     # Assigning id
     test_case_id = selected_test_case_option.split(". ", 1)[1]
